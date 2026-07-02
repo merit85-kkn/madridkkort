@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kort over jeres Madrid Rejse</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Indlæser Leaflet CSS og JS for at få kortet til at virke -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        /* Sikrer at kortet fylder hele skærmen uden hvide kanter */
+        html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+        #map { height: 100%; width: 100%; }
+        
+        /* Styling til den lille hvide boks nede i højre hjørne (Tegnforklaringen) */
+        .legend {
+            background: white;
+            padding: 12px;
+            line-height: 20px;
+            color: #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 13px;
+        }
+        .legend i {
+            width: 14px;
+            height: 14px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.9;
+            border-radius: 50%;
+        }
+        .legend-title { font-weight: bold; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Her placeres selve kort-grafikken -->
+<div id="map"></div>
+
+<script>
+    // Sætter start-koordinaterne (Madrid centrum) og zoom-niveau
+    var map = L.map('map').setView([40.4180, -3.6820], 14);
+
+    // Indlæser selve kort-fliserne (veje, byer, parker) fra OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Hjælpefunktion til at hente markører i de rigtige farver
+    function createIcon(color) {
+        return new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + '.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    }
+
+    // Opretter en farve-markør til hver dag
+    var hotelIcon = createIcon('black');
+    var mandagIcon = createIcon('green');
+    var tirsdagIcon = createIcon('blue');
+    var onsdagIcon = createIcon('gold');
+    var torsdagIcon = createIcon('violet');
+    var fredagIcon = createIcon('red');
+
+    // 1. Indsætter Hotellet som det sorte udgangspunkt
+    var hotel = L.marker([40.419041, -3.670617], {icon: hotelIcon}).addTo(map)
+        .bindPopup('<b>Jeres Hotel:</b><br>Novotel Madrid Center');
+
+    // --- MANDAG (Grøn Rute: Retiro) ---
+    var m1 = L.marker([40.4199, -3.6887], {icon: mandagIcon}).addTo(map).bindPopup('<b>Mandag:</b><br>Subway Alcalá 61 (Hent mad her)');
+    var m2 = L.marker([40.4172, -3.6830], {icon: mandagIcon}).addTo(map).bindPopup('<b>Mandag:</b><br>Buen Retiro Park (Robåde på søen)');
+    var m3 = L.marker([40.4136, -3.6818], {icon: mandagIcon}).addTo(map).bindPopup('<b>Mandag:</b><br>Krystalpaladset (Palacio de Cristal)');
+    
+    // Tegner den grønne stiplede linje mellem mandagens stop
+    var routeMandag = L.polyline([
+        [40.419041, -3.670617], // Start på hotellet
+        [40.4199, -3.6887],      // Til Subway
+        [40.4172, -3.6830],      // Til Søen
+        [40.4136, -3.6818]       // Til Paladset
+    ], {color: '#2A9D8F', dashArray: '8, 8', weight: 4}).addTo(map);
+
+    // --- TIRSDAG (Blå Rute: Det Royale) ---
+    var ti1 = L.marker([40.4166, -3.7037], {icon: tirsdagIcon}).addTo(map).bindPopup('<b>Tirsdag:</b><br>Puerta del Sol & Start på ruten');
+    var ti2 = L.marker([40.4172, -3.7055], {icon: tirsdagIcon}).addTo(map).bindPopup('<b>Tirsdag:</b><br>Subway Calle Arenal 10');
+    var ti3 = L.marker([40.4179, -3.7143], {icon: tirsdagIcon}).addTo(map).bindPopup('<b>Tirsdag:</b><br>Palacio Real (Paladset) & Plaza Mayor');
+
+    var routeTirsdag = L.polyline([
+        [40.4166, -3.7037],
+        [40.4172, -3.7055],
+        [40.4179, -3.7143]
+    ], {color: '#457B9D', dashArray: '8, 8', weight: 4}).addTo(map);
+
+    // --- ONSDAG (Gul Rute: Højder & Solnedgang) ---
+    var o1 = L.marker([40.4193, -3.6931], {icon: onsdagIcon}).addTo(map).bindPopup('<b>Onsdag:</b><br>Palacio de Cibeles (Udsigtstårn)');
+    var o2 = L.marker([40.4201, -3.6895], {icon: onsdagIcon}).addTo(map).bindPopup('<b>Onsdag:</b><br>VIPS (Frokost)');
+    var o3 = L.marker([40.4251, -3.6911], {icon: onsdagIcon}).addTo(map).bindPopup('<b>Onsdag:</b><br>Museo de Cera (Voksmuseet)');
+    var o4 = L.marker([40.4241, -3.7175], {icon: onsdagIcon}).addTo(map).bindPopup('<b>Onsdag:</b><br>Templo de Debod (Solnedgang)');
+
+    var routeOnsdag = L.polyline([
+        [40.4193, -3.6931],
+        [40.4201, -3.6895],
+        [40.4251, -3.6911],
+        [40.4241, -3.7175] // Bemærk: Denne streg springer gennem byen, da det primært er offentlig transport
+    ], {color: '#E9C46A', dashArray: '8, 8', weight: 4}).addTo(map);
+
+    // --- TORSDAG (Lilla Rute: Sanser) ---
+    var to1 = L.marker([40.4067, -3.6904], {icon: torsdagIcon}).addTo(map).bindPopup('<b>Torsdag:</b><br>Atocha Station (Indendørs Regnskov)');
+    var to2 = L.marker([40.4061, -3.6923], {icon: torsdagIcon}).addTo(map).bindPopup('<b>Torsdag:</b><br>IKONO Madrid (Boldbassin & Sanser)');
+
+    var routeTorsdag = L.polyline([
+        [40.4067, -3.6904],
+        [40.4061, -3.6923]
+    ], {color: '#9B5DE5', dashArray: '8, 8', weight: 4}).addTo(map);
+
+    // --- FREDAG (Rød Rute: Elevator) ---
+    var f1 = L.marker([40.4181, -3.6965], {icon: fredagIcon}).addTo(map).bindPopup('<b>Fredag:</b><br>Círculo de Bellas Artes (Glaselevator)');
+
+    // Bygger den lille informationsboks i højre hjørne (Tegnforklaringen)
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += '<div class="legend-title">Jeres Rejseplan</div>';
+        div.innerHTML += '<i style="background: black"></i> Jeres Hotel<br>';
+        div.innerHTML += '<i style="background: #2A9D8F"></i> Mandag (Retiro Park)<br>';
+        div.innerHTML += '<i style="background: #457B9D"></i> Tirsdag (Det Royale)<br>';
+        div.innerHTML += '<i style="background: #E9C46A"></i> Onsdag (Voks & Tempel)<br>';
+        div.innerHTML += '<i style="background: #9B5DE5"></i> Torsdag (IKONO)<br>';
+        div.innerHTML += '<i style="background: #E63946"></i> Fredag (Tagterrasse)<br>';
+        return div;
+    };
+    legend.addTo(map);
+
+</script>
+
+</body>
+</html>
